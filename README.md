@@ -32,6 +32,7 @@ A modern, responsive portfolio website showcasing my work as a full-stack develo
 | **Version Control** | Git, GitHub |
 
 ## 📂 Project Structure
+--
 portfolio/
 ├── public/
 │ └── images/ # Project screenshots
@@ -48,6 +49,7 @@ portfolio/
 ├── package.json
 └── vite.config.js
 
+--
 
 ## 🚀 My Projects
 
