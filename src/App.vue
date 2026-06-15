@@ -26,9 +26,9 @@
       <div class="container">
         <p>&copy; 2026 Joshua Macapagal. All rights reserved.</p>
         <div class="social-links">
-          <a href="https://github.com/macapagaljoshua123" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
-          <a href="mailto:your-email@example.com">Email</a>
+          <a href="https://github.com/macapagaljoshua123" target="_blank" rel="noopener"></a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener"></a>
+          <a href="mailto:your-email@example.com"></a>
         </div>
       </div>
     </footer>

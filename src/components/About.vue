@@ -17,7 +17,7 @@
           </p>
         </div>
         <div class="about-image">
-          <div class="placeholder-avatar">📷</div>
+          <img src="/avatar.png" alt="Joshua Macapagal" class="avatar-image">
         </div>
       </div>
     </div>
@@ -71,16 +71,13 @@ h2 {
   justify-content: center;
 }
 
-.placeholder-avatar {
+.avatar-image {
   width: 250px;
   height: 250px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 5rem;
+  object-fit: cover;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border: 5px solid #007bff;
 }
 
 @media (max-width: 768px) {
@@ -92,7 +89,7 @@ h2 {
     font-size: 2rem;
   }
 
-  .placeholder-avatar {
+  .avatar-image {
     width: 200px;
     height: 200px;
   }

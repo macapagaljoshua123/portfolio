@@ -63,21 +63,20 @@
         <div class="contact-info">
           <div class="info-item">
             <h3>📧 Email</h3>
-            <a href="mailto:your-email@example.com">your-email@example.com</a>
+            <a href="mailto:your-email@example.com">joshuamacapagal0409@gmail.com</a>
           </div>
           
           <div class="info-item">
             <h3>🔗 Social Links</h3>
             <div class="social-list">
-              <a href="https://github.com/macapagaljoshua123" target="_blank" rel="noopener">GitHub</a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
-              <a href="https://twitter.com" target="_blank" rel="noopener">Twitter</a>
+              <a href="https://github.com/macapagaljoshua123" target="_blank" rel="noopener">https://github.com/macapagaljoshua123</a>
+              <a href="https://www.linkedin.com/in/joshua-macapagal-5551643bb/" target="_blank" rel="noopener">LinkedIn</a>
             </div>
           </div>
           
           <div class="info-item">
             <h3>📍 Location</h3>
-            <p>Your City, Your Country</p>
+            <p>San Jose San Miguel Bulacan</p>
           </div>
         </div>
       </div>

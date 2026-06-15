@@ -22,15 +22,15 @@ export default {
       skillCategories: [
         {
           name: 'Frontend',
-          skills: ['Vue.js', 'React', 'HTML5', 'CSS3', 'JavaScript', 'Tailwind CSS']
+          skills: ['Vue.js', 'React', 'HTML5', 'CSS3', 'JavaScript', 'TypeScript', 'Tailwind CSS']
         },
         {
           name: 'Backend',
-          skills: ['Node.js', 'Express', 'Python', 'MongoDB', 'PostgreSQL', 'REST APIs']
+          skills: ['Node.js', 'Python', 'PostgreSQL', 'REST APIs']
         },
         {
           name: 'Tools & Platforms',
-          skills: ['Git', 'Docker', 'CI/CD', 'AWS', 'Firebase', 'Webpack']
+          skills: ['Git', 'Docker', 'Google AI Tools']
         },
         {
           name: 'Soft Skills',

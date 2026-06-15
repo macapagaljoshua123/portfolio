@@ -12,6 +12,7 @@
           </div>
           <div class="project-links">
             <a v-if="project.github" :href="project.github" target="_blank" rel="noopener">GitHub</a>
+            <a v-if="project.link" :href="project.link" target="_blank" rel="noopener">Website</a>
             <a v-if="project.demo" :href="project.demo" target="_blank" rel="noopener">Live Demo</a>
           </div>
         </div>
@@ -29,29 +30,28 @@ export default {
         {
           id: 1,
           title: 'Project One',
-          description: 'A modern web application built with Vue.js and Node.js that showcases best practices in full-stack development.',
-          icon: '🚀',
-          tech: ['Vue.js', 'Node.js', 'MongoDB'],
-          github: 'https://github.com/macapagaljoshua123',
-          demo: '#'
+          description: ' A web application deployed on a infinityfree hosting that includes a responsive design and modern UI elements. Also this web you can make Events, Live Forms, Word Clouds, and QnAce that you can make an Question and Answer like Kahoot',
+          icon: '',
+          tech: ['HTML/CSS', 'JavaScript', 'PHP/MySQL'],
+          github: 'https://github.com/macapagaljoshua123/edgelinkfree',
+          link: 'http://edgelinkwebapp.great-site.net/',
+          demo: 'http://edgelinkwebapp.great-site.net/'
         },
         {
           id: 2,
           title: 'Project Two',
-          description: 'An interactive dashboard with real-time data visualization and user analytics powered by modern technologies.',
-          icon: '📊',
-          tech: ['React', 'D3.js', 'Express'],
-          github: 'https://github.com/macapagaljoshua123',
-          demo: '#'
+          description: 'website allows users to explore a catalog of PC parts (CPU, GPU, motherboards, RAM, etc.), view detailed product information, filter by categories, and manage a shopping cart. It includes user authentication features for a personalized experience.',
+          icon: '',
+          tech: ['React', 'Fast API Python', 'PostgreSQL'],
+          github: 'https://github.com/macapagaljoshua123/pcgosite',
         },
         {
           id: 3,
           title: 'Project Three',
-          description: 'A mobile-first progressive web app that provides seamless user experience across all devices.',
-          icon: '📱',
-          tech: ['Vue.js', 'PWA', 'Firebase'],
-          github: 'https://github.com/macapagaljoshua123',
-          demo: '#'
+          description: 'AI-powered web search app with a TypeScript + React frontend and a Python FastAPI backend using Google Gemini AI and DuckDuckGo — no API key required for search (but AI needs Gemini API key).',
+          icon: '',
+          tech: ['TypeScript', 'Fast API Python', 'DuckduckGo', 'Google Gemini AI'],
+          github: 'https://github.com/macapagaljoshua123/dev-intern-search-api',
         }
       ]
     }
