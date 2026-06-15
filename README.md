@@ -7,11 +7,6 @@ A modern, responsive portfolio website showcasing my work as a full-stack develo
 
 🔗 **Live Demo:** [https://your-portfolio-name.vercel.app](https://portfolio-navy-beta-63.vercel.app/)
 
-## 📸 Screenshots
-
-| Light Mode | Dark Mode (Galaxy Theme) |
-|------------|--------------------------|
-| Coming soon | Coming soon |
 
 ## ✨ Features
 
@@ -33,26 +28,8 @@ A modern, responsive portfolio website showcasing my work as a full-stack develo
 | **Styling** | CSS3, CSS Variables, Flexbox, Grid |
 | **Icons** | Custom SVG icons |
 | **Form Handling** | Formspree API |
-| **Deployment** | Netlify |
+| **Deployment** | Vercel |
 | **Version Control** | Git, GitHub |
-
-## 📂 Project Structure
-portfolio/
-├── public/
-│ └── images/ # Project screenshots
-├── src/
-│ ├── components/
-│ │ ├── About.vue # About me section
-│ │ ├── Projects.vue # Projects carousel with modal
-│ │ ├── Skills.vue # Skills & expertise
-│ │ ├── Contact.vue # Contact form with validation
-│ │ └── Icon.vue # SVG icon components
-│ ├── App.vue # Main layout & navigation
-│ └── main.js # Entry point
-├── index.html
-├── package.json
-└── vite.config.js
-
 
 ## 🚀 My Projects
 
