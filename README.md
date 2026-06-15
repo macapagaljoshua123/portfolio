@@ -31,26 +31,6 @@ A modern, responsive portfolio website showcasing my work as a full-stack develo
 | **Deployment** | Vercel |
 | **Version Control** | Git, GitHub |
 
-## 📂 Project Structure
---
-portfolio/
-├── public/
-│ └── images/ # Project screenshots
-├── src/
-│ ├── components/
-│ │ ├── About.vue # About me section
-│ │ ├── Projects.vue # Projects carousel with modal
-│ │ ├── Skills.vue # Skills & expertise
-│ │ ├── Contact.vue # Contact form with validation
-│ │ └── Icon.vue # SVG icon components
-│ ├── App.vue # Main layout & navigation
-│ └── main.js # Entry point
-├── index.html
-├── package.json
-└── vite.config.js
-
---
-
 ## 🚀 My Projects
 
 ### 1. EdgeLink WebApp 🌐
