@@ -59,25 +59,14 @@ export default {
   padding: 6rem 2rem;
   background: white;
   transition: background-color 0.3s ease;
+  border-radius: 20px;
+  margin: 2rem;
+  position: relative;
+  z-index: 2;
 }
 
-:global(body.dark-mode) .skills,
-:global(html.dark-mode) .skills {
-  background: #1a1a1a;
-}
-
-:global(body.dark-mode) .skill-category,
-:global(html.dark-mode) .skill-category {
-  background: #1e1e2e;
-  border-color: rgba(255, 255, 255, 0.05);
-}
-
-:global(body.dark-mode) .skill-item,
-:global(html.dark-mode) .skill-item {
-  background: #2a2a3e;
-  color: #f0f0f0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  border-color: rgba(255, 255, 255, 0.05);
+.dark-mode .skills {
+  background: rgba(20, 20, 40, 0.85);
 }
 
 .container {
@@ -97,33 +86,25 @@ h2 {
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2.5rem;
+  gap: 2rem;
 }
 
 .skill-category {
   background: #f8f9fa;
-  padding: 2.5rem;
+  padding: 2rem;
   border-radius: 12px;
   transition: all 0.3s ease;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
 }
 
-:deep(.dark-mode) .skill-category {
-  background: #1e1e2e;
-  border-color: rgba(255, 255, 255, 0.05);
+.dark-mode .skill-category {
+  background: rgba(30, 30, 50, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .skill-category:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 24px rgba(0, 123, 255, 0.1);
-  background: #f0f7ff;
-}
-
-:deep(.dark-mode) .skill-category:hover {
-  background: #2a2a3e;
-  box-shadow: 0 12px 24px rgba(0, 123, 255, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.1);
 }
 
 .skill-header {
@@ -134,67 +115,55 @@ h2 {
 }
 
 .category-icon {
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
   color: white;
-  font-size: 1.5rem;
-  flex-shrink: 0;
+  font-size: 1.3rem;
 }
 
 .skill-category h3 {
   color: #007bff;
   margin: 0;
-  font-size: 1.3rem;
-  font-weight: 600;
+  font-size: 1.2rem;
 }
 
 .skills-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.8rem;
+  gap: 0.6rem;
 }
 
 .skill-item {
   background: white;
   color: #333;
-  padding: 0.6rem 1.2rem;
-  border-radius: 25px;
-  font-size: 0.9rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
   font-weight: 500;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  cursor: default;
 }
 
-:deep(.dark-mode) .skill-item {
-  background: #2a2a3e;
-  color: #f0f0f0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  border-color: rgba(255, 255, 255, 0.05);
+.dark-mode .skill-item {
+  background: rgba(50, 50, 70, 0.9);
+  color: #e0e0e0;
 }
 
 .skill-item:hover {
   background: #007bff;
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
-  border-color: #007bff;
-}
-
-:deep(.dark-mode) .skill-item:hover {
-  background: #007bff;
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
 }
 
 @media (max-width: 768px) {
   .skills {
     padding: 4rem 2rem;
+    margin: 1rem;
   }
 
   h2 {
@@ -202,71 +171,28 @@ h2 {
     margin-bottom: 3rem;
   }
 
-  .skills-grid {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 2rem;
-  }
-
   .skill-category {
-    padding: 2rem;
-  }
-
-  .skill-header {
-    gap: 0.8rem;
-  }
-
-  .category-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
-  }
-
-  .skill-category h3 {
-    font-size: 1.1rem;
-  }
-
-  .skill-item {
-    font-size: 0.85rem;
-    padding: 0.5rem 1rem;
+    padding: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .skills {
     padding: 3rem 1.5rem;
+    margin: 0.5rem;
   }
 
   h2 {
     font-size: 1.8rem;
   }
 
-  .skills-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
   .skill-category {
-    padding: 1.5rem;
-  }
-
-  .category-icon {
-    width: 36px;
-    height: 36px;
-    font-size: 1rem;
-  }
-
-  .skill-category h3 {
-    font-size: 1rem;
-  }
-
-  .skills-list {
-    gap: 0.6rem;
+    padding: 1rem;
   }
 
   .skill-item {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.9rem;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.8rem;
   }
 }
-</style>
 </style>

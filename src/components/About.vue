@@ -35,11 +35,14 @@ export default {
   padding: 6rem 2rem;
   background: white;
   transition: background-color 0.3s ease;
+  border-radius: 20px;
+  margin: 2rem;
+  position: relative;
+  z-index: 2;
 }
 
-:global(body.dark-mode) .about,
-:global(html.dark-mode) .about {
-  background: #1a1a1a;
+.dark-mode .about {
+  background: rgba(20, 20, 40, 0.85);
 }
 
 .container {
@@ -70,8 +73,8 @@ h2 {
   color: #333;
 }
 
-:deep(.dark-mode) .about-text p {
-  color: #ccc;
+.dark-mode .about-text p {
+  color: #e0e0e0;
 }
 
 .about-image {
@@ -97,6 +100,7 @@ h2 {
 @media (max-width: 768px) {
   .about {
     padding: 4rem 2rem;
+    margin: 1rem;
   }
 
   .about-content {
@@ -122,6 +126,7 @@ h2 {
 @media (max-width: 480px) {
   .about {
     padding: 3rem 1.5rem;
+    margin: 0.5rem;
   }
 
   .about-content {
