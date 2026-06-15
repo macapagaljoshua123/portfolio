@@ -6,6 +6,13 @@
         I'm always interested in hearing about new projects and opportunities. Feel free to reach out!
       </p>
       
+      <!-- ADDED: Resume Download Button -->
+      <div class="resume-section">
+        <a href="/resume.pdf" download class="resume-btn" aria-label="Download resume PDF">
+          📄 Download Resume (PDF)
+        </a>
+      </div>
+      
       <div class="contact-content">
         <div class="contact-form">
           <form @submit.prevent="submitForm" novalidate>
@@ -17,6 +24,7 @@
                 id="name" 
                 placeholder="Your name"
                 @blur="validateField('name')"
+                aria-required="true"
               >
               <span v-if="errors.name" class="error-message">{{ errors.name }}</span>
             </div>
@@ -29,6 +37,7 @@
                 id="email" 
                 placeholder="your@email.com"
                 @blur="validateField('email')"
+                aria-required="true"
               >
               <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
             </div>
@@ -41,11 +50,19 @@
                 placeholder="Your message..."
                 rows="5"
                 @blur="validateField('message')"
+                @input="updateCharCount"
+                maxlength="500"
+                aria-required="true"
               ></textarea>
+              <!-- ADDED: Character Counter -->
+              <div class="char-counter" :class="{ 'char-warning': charCount > 450, 'char-danger': charCount >= 500 }">
+                {{ charCount }}/500 characters
+                <span v-if="charCount >= 500" class="warning-text"> - Maximum reached</span>
+              </div>
               <span v-if="errors.message" class="error-message">{{ errors.message }}</span>
             </div>
             
-            <button type="submit" class="submit-btn" :disabled="isSubmitting">
+            <button type="submit" class="submit-btn" :disabled="isSubmitting || charCount >= 500">
               <span v-if="isSubmitting" class="spinner"></span>
               <span v-else>📧 Send Message</span>
             </button>
@@ -67,6 +84,7 @@
               <h3>Social Links</h3>
             </div>
             <div class="social-list">
+              <!-- ADDED rel="noopener noreferrer" for security -->
               <a href="https://github.com/macapagaljoshua123" target="_blank" rel="noopener noreferrer">
                 <Icon name="github" /> GitHub
               </a>
@@ -88,7 +106,7 @@
     </div>
 
     <!-- Toast Notification -->
-    <div v-if="toast.show" :class="['toast', toast.type]" @click="toast.show = false">
+    <div v-if="toast.show" :class="['toast', toast.type]" @click="toast.show = false" role="alert">
       <span class="toast-icon">{{ toast.type === 'success' ? '✓' : '✗' }}</span>
       <span class="toast-message">{{ toast.message }}</span>
     </div>
@@ -100,7 +118,6 @@ import Icon from './Icon.vue'
 
 // ✅ IMPORTANT: You MUST replace this with your REAL Formspree form ID
 // Get it from: https://formspree.io/ (Sign up → Create new form → Copy your form ID)
-// Your form ID will look like: "xeqvzrkv" or similar
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xkoaynbj'
 
 export default {
@@ -125,10 +142,16 @@ export default {
         show: false,
         message: '',
         type: 'success'
-      }
+      },
+      // ADDED: Character counter
+      charCount: 0
     }
   },
   methods: {
+    // ADDED: Update character counter
+    updateCharCount() {
+      this.charCount = this.form.message.length
+    },
     validateField(field) {
       const value = this.form[field].trim()
       
@@ -159,6 +182,8 @@ export default {
             this.errors.message = 'Message is required'
           } else if (value.length < 10) {
             this.errors.message = 'Message must be at least 10 characters'
+          } else if (value.length > 500) {
+            this.errors.message = 'Message must not exceed 500 characters'
           } else {
             this.errors.message = ''
           }
@@ -180,16 +205,15 @@ export default {
         type
       }
       
-      // Auto hide after 4 seconds
       setTimeout(() => {
         this.toast.show = false
       }, 4000)
     },
     
     async submitForm() {
-      // Check if Formspree ID is still placeholder
-      if (FORMSPREE_ENDPOINT.includes('YOUR_FORM_ID_HERE')) {
-        this.showToast('⚠️ Form not configured yet. Please email me directly at joshuamacapagal0409@gmail.com', 'error')
+      // Check character limit
+      if (this.charCount > 500) {
+        this.showToast('Message exceeds 500 character limit. Please shorten your message.', 'error')
         return
       }
       
@@ -240,6 +264,7 @@ export default {
         email: '',
         message: ''
       }
+      this.charCount = 0
     }
   }
 }
@@ -276,13 +301,42 @@ h2 {
 .contact-intro {
   text-align: center;
   font-size: 1.05rem;
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
   color: #666;
   line-height: 1.6;
 }
 
 .dark-mode .contact-intro {
   color: #e0e0e0;
+}
+
+/* ADDED: Resume Section */
+.resume-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.resume-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.resume-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+}
+
+.resume-btn:focus-visible {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
 }
 
 .contact-content {
@@ -358,6 +412,31 @@ h2 {
   color: #dc3545;
   font-size: 0.8rem;
   margin-top: 0.3rem;
+}
+
+/* ADDED: Character Counter Styles */
+.char-counter {
+  text-align: right;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.dark-mode .char-counter {
+  color: #aaa;
+}
+
+.char-warning {
+  color: #ff9800;
+}
+
+.char-danger {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.warning-text {
+  font-size: 0.75rem;
 }
 
 .submit-btn {
@@ -555,6 +634,11 @@ h2 {
   .contact-content {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+  
+  .resume-btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
   }
 }
 

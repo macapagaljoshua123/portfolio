@@ -3,34 +3,28 @@
     <!-- Dark Mode Background -->
     <div class="dark-bg" v-if="darkMode"></div>
     
-    <!-- Galaxy Elements - Pure CSS Graphics (Dark Mode Only) -->
-    <div class="galaxy-elements" v-if="darkMode">
-      <!-- Stars Container -->
+    <!-- Galaxy Elements - Now only visible in About section -->
+    <div class="galaxy-elements" v-if="darkMode" ref="galaxyContainer">
+      <!-- Stars -->
       <div class="stars-container">
-        <div class="star"></div>
-        <div class="star"></div>
-        <div class="star"></div>
-        <div class="star"></div>
-        <div class="star"></div>
-        <div class="star"></div>
-        <div class="star"></div>
-        <div class="star"></div>
-        <div class="star"></div>
-        <div class="star"></div>
-        <div class="star"></div>
-        <div class="star"></div>
+        <div class="star" v-for="i in 30" :key="i" :style="{ top: Math.random() * 100 + '%', left: Math.random() * 100 + '%', animationDelay: Math.random() * 5 + 's' }"></div>
       </div>
       
-      <!-- Planet 1 - Jupiter-like -->
-      <div class="planet jupiter">
+      <!-- Planet Jupiter -->
+      <div class="planet jupiter" @click.stop="showCharacterMessage($event, 'jupiter')">
         <div class="planet-ring"></div>
+        <div class="planet-tooltip">Click me! 🪐</div>
       </div>
       
-      <!-- Planet 2 - Earth-like -->
-      <div class="planet earth"></div>
+      <!-- Planet Earth -->
+      <div class="planet earth" @click.stop="showCharacterMessage($event, 'earth')">
+        <div class="planet-tooltip">Click me! 🌍</div>
+      </div>
       
-      <!-- Planet 3 - Mars-like -->
-      <div class="planet mars"></div>
+      <!-- Planet Mars -->
+      <div class="planet mars" @click.stop="showCharacterMessage($event, 'mars')">
+        <div class="planet-tooltip">Click me! 🔴</div>
+      </div>
       
       <!-- Spaceship -->
       <div class="spaceship">
@@ -41,37 +35,40 @@
       </div>
       
       <!-- Alien 1 -->
-      <div class="alien alien-1">
+      <div class="alien alien-1" @click.stop="showCharacterMessage($event, 'alien1')">
         <div class="alien-head"></div>
         <div class="alien-eyes">
           <div class="alien-eye"></div>
           <div class="alien-eye"></div>
         </div>
         <div class="alien-body"></div>
+        <div class="alien-tooltip">Click me! 👽</div>
       </div>
       
       <!-- Alien 2 -->
-      <div class="alien alien-2">
+      <div class="alien alien-2" @click.stop="showCharacterMessage($event, 'alien2')">
         <div class="alien-head"></div>
         <div class="alien-eyes">
           <div class="alien-eye"></div>
           <div class="alien-eye"></div>
         </div>
         <div class="alien-body"></div>
+        <div class="alien-tooltip">Click me! 👾</div>
       </div>
       
       <!-- Alien 3 -->
-      <div class="alien alien-3">
+      <div class="alien alien-3" @click.stop="showCharacterMessage($event, 'alien3')">
         <div class="alien-head"></div>
         <div class="alien-eyes">
           <div class="alien-eye"></div>
           <div class="alien-eye"></div>
         </div>
         <div class="alien-body"></div>
+        <div class="alien-tooltip">Click me! 👽</div>
       </div>
       
       <!-- Moon with Astronaut -->
-      <div class="moon-scene">
+      <div class="moon-scene" @click.stop="showCharacterMessage($event, 'astronaut')">
         <div class="moon-crater"></div>
         <div class="moon-crater-2"></div>
         <div class="astronaut">
@@ -85,18 +82,28 @@
             <div class="flag-sun"></div>
           </div>
         </div>
+        <div class="moon-tooltip">Click me! 👨‍🚀</div>
       </div>
       
-      <!-- Shooting Stars -->
-      <div class="shooting-star"></div>
-      <div class="shooting-star second"></div>
+      <!-- Shooting Stars - Fixed: Normal falling stars -->
+      <div class="shooting-star" v-for="i in 8" :key="i" :style="{ animationDelay: `${i * 2}s`, top: `${Math.random() * 80}%`, left: `${Math.random() * 100}%` }"></div>
       
       <!-- Satellite -->
-      <div class="satellite">
+      <div class="satellite" @click.stop="showCharacterMessage($event, 'satellite')">
         <div class="satellite-body"></div>
         <div class="satellite-panel panel-left"></div>
         <div class="satellite-panel panel-right"></div>
+        <div class="satellite-tooltip">Click me! 🛰️</div>
       </div>
+    </div>
+
+    <!-- Speech Bubbles - Positioned above characters -->
+    <div v-if="activeCharacter" class="global-speech-bubble" :class="bubbleType" :style="bubbleStyle">
+      <div class="bubble-content">
+        <span class="bubble-icon">{{ bubbleIcon }}</span>
+        <p>{{ activeMessage }}</p>
+      </div>
+      <div class="bubble-tail"></div>
     </div>
 
     <!-- Navbar -->
@@ -122,12 +129,14 @@
       <Contact ref="contactSection" />
     </main>
 
+    <button v-show="showBackToTop" class="back-to-top" @click="scrollToTop">↑</button>
+
     <footer class="footer">
       <div class="container">
         <p>&copy; 2026 Joshua Macapagal. All rights reserved.</p>
         <div class="social-links">
-          <a href="https://github.com/macapagaljoshua123" target="_blank" rel="noopener"><Icon name="github" /></a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener"><Icon name="linkedin" /></a>
+          <a href="https://github.com/macapagaljoshua123" target="_blank" rel="noopener noreferrer"><Icon name="github" /></a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"><Icon name="linkedin" /></a>
           <a href="mailto:joshuamacapagal0409@gmail.com"><Icon name="mail" /></a>
         </div>
       </div>
@@ -153,7 +162,35 @@ export default {
   },
   data() {
     return {
-      darkMode: false
+      darkMode: false,
+      showBackToTop: false,
+      activeCharacter: null,
+      activeMessage: '',
+      bubbleIcon: '',
+      bubbleType: 'alien',
+      bubbleStyle: {},
+      messageTimeout: null,
+      scrollHandler: null
+    }
+  },
+  mounted() {
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true'
+    if (savedDarkMode) {
+      this.darkMode = true
+    }
+    window.addEventListener('scroll', this.handleScroll)
+    
+    // Position galaxy elements relative to About section
+    this.$nextTick(() => {
+      this.positionGalaxyElements()
+      window.addEventListener('scroll', this.positionGalaxyElements)
+    })
+  },
+  beforeUnmount() {
+    window.removeEventListener('scroll', this.handleScroll)
+    window.removeEventListener('scroll', this.positionGalaxyElements)
+    if (this.messageTimeout) {
+      clearTimeout(this.messageTimeout)
     }
   },
   methods: {
@@ -166,12 +203,114 @@ export default {
       if (section) {
         section.$el.scrollIntoView({ behavior: 'smooth' })
       }
-    }
-  },
-  mounted() {
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true'
-    if (savedDarkMode) {
-      this.darkMode = true
+    },
+    handleScroll() {
+      this.showBackToTop = window.scrollY > 300
+    },
+    scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+    positionGalaxyElements() {
+      const aboutSection = this.$refs.aboutSection?.$el
+      if (aboutSection && this.darkMode) {
+        const rect = aboutSection.getBoundingClientRect()
+        const galaxyEl = this.$refs.galaxyContainer
+        if (galaxyEl) {
+          // Position galaxy only within About section
+          galaxyEl.style.position = 'absolute'
+          galaxyEl.style.top = `${window.scrollY + rect.top}px`
+          galaxyEl.style.height = `${rect.height}px`
+        }
+      }
+    },
+    showCharacterMessage(event, character) {
+      // Clear previous timeout
+      if (this.messageTimeout) {
+        clearTimeout(this.messageTimeout)
+      }
+      
+      // Get character position
+      const rect = event.currentTarget.getBoundingClientRect()
+      
+      // Set message based on character
+      let message = ''
+      let icon = ''
+      let type = 'alien'
+      
+      switch(character) {
+        case 'jupiter':
+          message = 'Your skills are massive like my Great Red Spot!'
+          icon = '🪐'
+          type = 'planet'
+          break
+        case 'earth':
+          message = 'Earth welcomes you! Keep building amazing things! 🌍'
+          icon = '🌍'
+          type = 'planet'
+          break
+        case 'mars':
+          message = 'Mars is impressed! Your code is red-hot! 🔴'
+          icon = '🔴'
+          type = 'planet'
+          break
+        case 'alien1':
+          message = 'Zorp zorp! We come in peace! Take me to your developer! 👽'
+          icon = '👽'
+          type = 'alien'
+          break
+        case 'alien2':
+          message = 'Beep boop! Your portfolio is out of this world! 🚀'
+          icon = '👾'
+          type = 'alien'
+          break
+        case 'alien3':
+          message = 'Greetings Earthling! Love your Vue.js skills! Keep coding! 🛸'
+          icon = '🛸'
+          type = 'alien'
+          break
+        case 'astronaut':
+          const messages = [
+            'Houston, we have a solution! Amazing portfolio, Joshua! 🚀',
+            'One small click for man, one giant leap for your career! 🌙',
+            'To infinity and beyond! Your code is stellar! ⭐',
+            'Star quality detected! This developer is going places! ✨'
+          ]
+          message = messages[Math.floor(Math.random() * messages.length)]
+          icon = '👨‍🚀'
+          type = 'human'
+          break
+        case 'satellite':
+          message = '🛰️ "Signal received! Your coding frequency is excellent! Keep transmitting!"'
+          icon = '🛰️'
+          type = 'human'
+          break
+      }
+      
+      this.activeMessage = message
+      this.bubbleIcon = icon
+      this.bubbleType = type
+      this.activeCharacter = character
+      
+      // Position bubble ABOVE the character's head
+      this.bubbleStyle = {
+        position: 'fixed',
+        top: (rect.top - 100) + 'px',
+        left: (rect.left + rect.width / 2 - 140) + 'px',
+        zIndex: 2000
+      }
+      
+      // Make sure bubble stays in viewport
+      if (parseInt(this.bubbleStyle.left) < 10) {
+        this.bubbleStyle.left = '10px'
+      }
+      if (parseInt(this.bubbleStyle.left) + 280 > window.innerWidth) {
+        this.bubbleStyle.left = (window.innerWidth - 290) + 'px'
+      }
+      
+      // Auto hide after 4 seconds
+      this.messageTimeout = setTimeout(() => {
+        this.activeCharacter = null
+      }, 4000)
     }
   }
 }
@@ -190,12 +329,10 @@ export default {
   min-height: 100vh;
 }
 
-/* Light Mode */
 .app-container:not(.dark-mode) {
   background: #ffffff;
 }
 
-/* Dark Mode Background */
 .dark-bg {
   position: fixed;
   top: 0;
@@ -206,16 +343,159 @@ export default {
   z-index: 0;
 }
 
-/* Galaxy Elements Layer */
+/* Galaxy Elements - Positioned relative to About section */
 .galaxy-elements {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
   pointer-events: none;
-  z-index: 1;
-  overflow: hidden;
+  z-index: 20;
+  overflow: visible;
+}
+
+.galaxy-elements .planet,
+.galaxy-elements .alien,
+.galaxy-elements .moon-scene,
+.galaxy-elements .satellite {
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  position: absolute;
+  z-index: 25;
+}
+
+.galaxy-elements .planet:hover,
+.galaxy-elements .alien:hover,
+.galaxy-elements .moon-scene:hover,
+.galaxy-elements .satellite:hover {
+  transform: scale(1.15);
+  filter: brightness(1.2) drop-shadow(0 0 10px rgba(255,255,255,0.4));
+}
+
+/* Tooltips */
+.planet-tooltip,
+.alien-tooltip,
+.moon-tooltip,
+.satellite-tooltip {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 10px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 30;
+  font-weight: bold;
+}
+
+.planet:hover .planet-tooltip,
+.alien:hover .alien-tooltip,
+.moon-scene:hover .moon-tooltip,
+.satellite:hover .satellite-tooltip {
+  opacity: 1;
+}
+
+/* ========== GLOBAL SPEECH BUBBLE ========== */
+.global-speech-bubble {
+  position: fixed;
+  background: white;
+  border-radius: 20px;
+  padding: 15px 20px;
+  min-width: 260px;
+  max-width: 320px;
+  animation: bubblePop 0.3s ease-out;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  z-index: 2000;
+}
+
+.bubble-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bubble-icon {
+  font-size: 2.5rem;
+}
+
+.bubble-content p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #333;
+  font-weight: 500;
+}
+
+.bubble-tail {
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 12px solid white;
+}
+
+/* Alien Bubble */
+.global-speech-bubble.alien {
+  background: #1a2e1a;
+  border: 2px solid #4CAF50;
+}
+
+.global-speech-bubble.alien .bubble-content p {
+  color: #90EE90;
+}
+
+.global-speech-bubble.alien .bubble-tail {
+  border-top-color: #1a2e1a;
+}
+
+/* Human Bubble */
+.global-speech-bubble.human {
+  background: #1a2a3e;
+  border: 2px solid #007bff;
+}
+
+.global-speech-bubble.human .bubble-content p {
+  color: #87CEEB;
+}
+
+.global-speech-bubble.human .bubble-tail {
+  border-top-color: #1a2a3e;
+}
+
+/* Planet Bubble */
+.global-speech-bubble.planet {
+  background: #3e2a1a;
+  border: 2px solid #FF9800;
+}
+
+.global-speech-bubble.planet .bubble-content p {
+  color: #FFD699;
+}
+
+.global-speech-bubble.planet .bubble-tail {
+  border-top-color: #3e2a1a;
+}
+
+@keyframes bubblePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 /* ========== STARS ========== */
@@ -223,6 +503,7 @@ export default {
   position: absolute;
   width: 100%;
   height: 100%;
+  pointer-events: none;
 }
 
 .star {
@@ -235,19 +516,6 @@ export default {
   animation: twinkle 3s ease-in-out infinite;
 }
 
-.star:nth-child(1) { top: 5%; left: 10%; width: 3px; height: 3px; animation-delay: 0s; }
-.star:nth-child(2) { top: 15%; left: 85%; width: 2px; height: 2px; animation-delay: 0.5s; }
-.star:nth-child(3) { top: 25%; left: 45%; width: 2px; height: 2px; animation-delay: 1s; }
-.star:nth-child(4) { top: 35%; left: 70%; width: 3px; height: 3px; animation-delay: 1.5s; }
-.star:nth-child(5) { top: 45%; left: 20%; width: 2px; height: 2px; animation-delay: 0.3s; }
-.star:nth-child(6) { top: 55%; left: 90%; width: 3px; height: 3px; animation-delay: 0.8s; }
-.star:nth-child(7) { top: 65%; left: 35%; width: 2px; height: 2px; animation-delay: 1.2s; }
-.star:nth-child(8) { top: 75%; left: 55%; width: 3px; height: 3px; animation-delay: 0.1s; }
-.star:nth-child(9) { top: 85%; left: 15%; width: 2px; height: 2px; animation-delay: 1.8s; }
-.star:nth-child(10) { top: 95%; left: 75%; width: 2px; height: 2px; animation-delay: 0.6s; }
-.star:nth-child(11) { top: 10%; left: 50%; width: 2px; height: 2px; animation-delay: 2s; }
-.star:nth-child(12) { top: 40%; left: 80%; width: 3px; height: 3px; animation-delay: 2.5s; }
-
 @keyframes twinkle {
   0%, 100% { opacity: 0.3; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.5); }
@@ -255,18 +523,16 @@ export default {
 
 /* ========== PLANETS ========== */
 .planet {
-  position: absolute;
   border-radius: 50%;
   animation: floatPlanet 20s ease-in-out infinite;
   box-shadow: 0 0 30px rgba(255,255,255,0.2);
 }
 
-/* Jupiter */
 .jupiter {
   width: 100px;
   height: 100px;
-  top: 12%;
-  right: 3%;
+  top: 15%;
+  right: 5%;
   background: linear-gradient(135deg, #D2B48C, #A0522D, #8B4513);
   animation-duration: 25s;
 }
@@ -282,22 +548,20 @@ export default {
   transform: rotate(-15deg);
 }
 
-/* Earth */
 .earth {
   width: 65px;
   height: 65px;
-  bottom: 15%;
-  left: 3%;
+  bottom: 10%;
+  left: 5%;
   background: linear-gradient(135deg, #4169E1, #228B22, #87CEEB);
   animation-duration: 18s;
   animation-delay: 2s;
 }
 
-/* Mars */
 .mars {
   width: 50px;
   height: 50px;
-  top: 55%;
+  top: 50%;
   right: 8%;
   background: linear-gradient(135deg, #DC143C, #8B0000);
   animation-duration: 15s;
@@ -312,9 +576,11 @@ export default {
 /* ========== SPACESHIP ========== */
 .spaceship {
   position: absolute;
-  top: 45%;
+  top: 40%;
   left: -80px;
   animation: flySpaceship 14s linear infinite;
+  pointer-events: none;
+  z-index: 22;
 }
 
 .spaceship-body {
@@ -374,30 +640,29 @@ export default {
 
 /* ========== ALIENS ========== */
 .alien {
-  position: absolute;
   animation: danceAlien 2s ease-in-out infinite;
 }
 
 .alien-1 {
-  top: 20%;
-  left: 20%;
+  top: 25%;
+  left: 15%;
 }
 
 .alien-2 {
-  top: 70%;
-  left: 75%;
+  top: 65%;
+  left: 70%;
   animation-delay: 0.5s;
 }
 
 .alien-3 {
-  top: 80%;
-  right: 10%;
+  top: 75%;
+  right: 8%;
   animation-delay: 1s;
 }
 
 .alien-head {
-  width: 35px;
-  height: 35px;
+  width: 40px;
+  height: 40px;
   background: #4CAF50;
   border-radius: 50%;
   position: relative;
@@ -415,8 +680,8 @@ export default {
   display: flex;
   gap: 8px;
   position: absolute;
-  top: 10px;
-  left: 7px;
+  top: 12px;
+  left: 8px;
 }
 
 .alien-eye {
@@ -436,12 +701,12 @@ export default {
 }
 
 .alien-body {
-  width: 20px;
-  height: 15px;
+  width: 25px;
+  height: 18px;
   background: #4CAF50;
   border-radius: 10px;
   position: absolute;
-  bottom: -15px;
+  bottom: -18px;
   left: 7px;
 }
 
@@ -462,9 +727,8 @@ export default {
 
 /* ========== MOON & ASTRONAUT ========== */
 .moon-scene {
-  position: absolute;
-  bottom: 5%;
-  right: 3%;
+  bottom: 8%;
+  right: 5%;
   animation: bounceMoon 3s ease-in-out infinite;
 }
 
@@ -590,38 +854,44 @@ export default {
   50% { transform: translateY(-8px); }
 }
 
-/* ========== SHOOTING STARS ========== */
+/* ========== SHOOTING STARS - FIXED: Normal falling stars ========== */
 .shooting-star {
   position: absolute;
-  width: 100px;
-  height: 2px;
-  background: linear-gradient(90deg, white, transparent);
-  top: 15%;
-  right: 0;
-  animation: shootStar 10s linear infinite;
-  transform: rotate(35deg);
+  width: 2px;
+  height: 80px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0));
+  animation: shootStar 4s linear infinite;
+  opacity: 0;
+  pointer-events: none;
+  transform: rotate(0deg);
 }
 
-.shooting-star.second {
-  top: 45%;
-  animation-duration: 14s;
-  animation-delay: 5s;
+.shooting-star::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -4px;
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, rgba(255,255,200,1), rgba(255,255,255,0));
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(255,255,200,0.9);
 }
 
 @keyframes shootStar {
   0% {
-    transform: translateX(0) translateY(0) rotate(35deg);
+    transform: translateY(-100px) translateX(0);
     opacity: 0;
   }
   10% {
     opacity: 1;
   }
-  20% {
-    transform: translateX(-500px) translateY(200px) rotate(35deg);
+  80% {
+    transform: translateY(300px) translateX(100px);
     opacity: 1;
   }
   100% {
-    transform: translateX(-800px) translateY(350px) rotate(35deg);
+    transform: translateY(400px) translateX(150px);
     opacity: 0;
   }
 }
@@ -629,39 +899,41 @@ export default {
 /* ========== SATELLITE ========== */
 .satellite {
   position: absolute;
-  top: 65%;
-  left: -50px;
-  animation: satelliteOrbit 18s linear infinite;
+  top: 30%;
+  right: 10%;
+  animation: satelliteOrbit 12s ease-in-out infinite;
+  cursor: pointer;
+  z-index: 22;
 }
 
 .satellite-body {
-  width: 20px;
-  height: 20px;
+  width: 25px;
+  height: 25px;
   background: #C0C0C0;
   border-radius: 5px;
 }
 
 .satellite-panel {
   position: absolute;
-  width: 30px;
+  width: 40px;
   height: 15px;
   background: #4169E1;
-  top: 2px;
+  top: 5px;
 }
 
 .panel-left {
-  left: -35px;
+  left: -45px;
   border-radius: 5px 0 0 5px;
 }
 
 .panel-right {
-  right: -35px;
+  right: -45px;
   border-radius: 0 5px 5px 0;
 }
 
 @keyframes satelliteOrbit {
-  0% { transform: translateX(0) translateY(0); }
-  100% { transform: translateX(calc(100vw + 100px)) translateY(-50px); }
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-30px) rotate(5deg); }
 }
 
 /* ========== NAVBAR ========== */
@@ -671,7 +943,6 @@ export default {
   position: sticky;
   top: 0;
   z-index: 100;
-  transition: all 0.3s ease;
 }
 
 .dark-mode .navbar {
@@ -692,20 +963,17 @@ export default {
   font-size: 1.5rem;
   font-weight: 700;
   color: #007bff;
-  letter-spacing: -0.5px;
 }
 
 .nav-links {
   display: flex;
   gap: 2.5rem;
   align-items: center;
-  flex-wrap: wrap;
 }
 
 .nav-links a {
   color: #333;
   font-weight: 500;
-  font-size: 0.95rem;
   text-decoration: none;
   position: relative;
 }
@@ -748,21 +1016,59 @@ export default {
   transform: rotate(20deg);
 }
 
-/* ========== MAIN CONTENT ========== */
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #007bff;
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.back-to-top:hover {
+  transform: translateY(-5px);
+  background: #0056b3;
+}
+
 main {
   position: relative;
-  z-index: 10;
+  z-index: 15;
   min-height: calc(100vh - 200px);
 }
 
-/* ========== FOOTER ========== */
+:deep(.about), 
+:deep(.projects), 
+:deep(.skills), 
+:deep(.contact) {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-radius: 20px !important;
+  margin: 2rem !important;
+  position: relative;
+  z-index: 15;
+  backdrop-filter: blur(4px);
+}
+
+.dark-mode :deep(.about),
+.dark-mode :deep(.projects),
+.dark-mode :deep(.skills),
+.dark-mode :deep(.contact) {
+  background: rgba(15, 15, 35, 0.85) !important;
+}
+
 .footer {
   background: #f8f9fa;
   padding: 3rem 2rem;
   text-align: center;
   border-top: 1px solid #dee2e6;
   position: relative;
-  z-index: 10;
+  z-index: 15;
 }
 
 .dark-mode .footer {
@@ -815,28 +1121,23 @@ main {
   padding: 0 2rem;
 }
 
-/* Component Styles - Transparent para kita ang galaxy */
-:deep(.about), :deep(.projects), :deep(.skills), :deep(.contact) {
-  background: rgba(255, 255, 255, 0.95) !important;
-  transition: background 0.3s ease;
-  border-radius: 20px !important;
-  margin: 2rem !important;
-}
-
-.dark-mode :deep(.about),
-.dark-mode :deep(.projects),
-.dark-mode :deep(.skills),
-.dark-mode :deep(.contact) {
-  background: rgba(20, 20, 40, 0.85) !important;
-  backdrop-filter: none !important;
-}
-
 @media (max-width: 768px) {
   .jupiter, .earth, .mars { transform: scale(0.7); }
   .alien, .spaceship, .satellite { transform: scale(0.8); }
   .moon-scene { transform: scale(0.7); bottom: 0; }
   :deep(.about), :deep(.projects), :deep(.skills), :deep(.contact) {
     margin: 1rem !important;
+  }
+  .global-speech-bubble {
+    min-width: 200px;
+    max-width: 250px;
+    padding: 10px 15px;
+  }
+  .bubble-icon {
+    font-size: 1.8rem;
+  }
+  .bubble-content p {
+    font-size: 0.8rem;
   }
 }
 

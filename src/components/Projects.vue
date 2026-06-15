@@ -3,6 +3,19 @@
     <div class="container">
       <h2>Featured Projects</h2>
       
+      <!-- Filter Buttons -->
+      <div class="filter-buttons" role="tablist" aria-label="Project categories">
+        <button 
+          v-for="category in categories" 
+          :key="category"
+          @click="currentCategory = category"
+          :class="['filter-btn', { active: currentCategory === category }]"
+          :aria-pressed="currentCategory === category"
+        >
+          {{ category === 'all' ? 'All Projects' : category }}
+        </button>
+      </div>
+      
       <div class="carousel-container">
         <div class="carousel-wrapper">
           <div 
@@ -10,7 +23,7 @@
             :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
           >
             <div 
-              v-for="(project, index) in projects" 
+              v-for="(project, index) in filteredProjects" 
               :key="project.id" 
               class="project-card"
               @click="openModal(project)"
@@ -42,7 +55,7 @@
 
         <div class="carousel-dots">
           <span 
-            v-for="(_, index) in projects" 
+            v-for="(_, index) in filteredProjects" 
             :key="index"
             class="dot"
             :class="{ active: currentIndex === index }"
@@ -52,7 +65,7 @@
       </div>
 
       <!-- Modal -->
-      <div v-if="selectedProject" class="modal" @click.self="closeModal">
+      <div v-if="selectedProject" class="modal" @click.self="closeModal" role="dialog" aria-modal="true">
         <div class="modal-content">
           <button class="modal-close" @click="closeModal" aria-label="Close">×</button>
           
@@ -91,6 +104,22 @@
                 <Icon name="external" /> Live Demo
               </a>
             </div>
+            
+            <!-- Git Clone Button -->
+            <div class="git-clone-section" v-if="selectedProject.github">
+              <div class="clone-input-group">
+                <input 
+                  type="text" 
+                  :value="`git clone ${selectedProject.github}`" 
+                  id="gitCloneUrl" 
+                  readonly
+                  aria-label="Git clone command"
+                >
+                <button @click="copyGitClone" class="copy-btn" :aria-label="'Copy git clone command'">
+                  {{ copyButtonText }}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -112,42 +141,58 @@ export default {
       selectedProject: null,
       autoplayInterval: null,
       scrollPosition: 0,
+      currentCategory: 'all',
+      copyButtonText: 'Copy',
       projects: [
         {
           id: 1,
           title: 'EdgeLink WebApp',
           icon: '🌐',
           tagline: 'Interactive Event Platform',
-          image: 'edgelink.png',
+          image: '/images/edgelink.png',
           fallbackImage: '/images/fallback-project.png',
           description: 'A web application deployed on infinityfree hosting that includes a responsive design and modern UI elements. This web app allows you to create Events, Live Forms, Word Clouds, and QnAce for interactive Q&A sessions like Kahoot.',
           tech: ['HTML/CSS', 'JavaScript', 'PHP/MySQL'],
           github: 'https://github.com/macapagaljoshua123/edgelinkfree',
-          link: 'http://edgelinkwebapp.great-site.net/'
+          link: 'http://edgelinkwebapp.great-site.net/',
+          category: 'fullstack'
         },
         {
           id: 2,
           title: 'PC Parts E-Commerce',
           icon: '🖥️',
           tagline: 'Build Your Dream PC',
-          image: 'pceco.png',
+          image: '/images/pceco.png',
           fallbackImage: '/images/fallback-project.png',
           description: 'A full-stack web application for browsing and purchasing PC components. Built with React.js frontend, Node.js backend, and PostgreSQL database. Features include product filtering, shopping cart, and user authentication.',
           tech: ['React', 'Node.js', 'PostgreSQL'],
           github: 'https://github.com/macapagaljoshua123/pcgosite',
+          category: 'fullstack'
         },
         {
           id: 3,
           title: 'AI Search App',
           icon: '✨',
           tagline: 'AI-Powered Web Search',
-          image: 'ai-assistant.png',
+          image: '/images/ai-assistant.png',
           fallbackImage: '/images/fallback-project.png',
           description: 'AI-powered web search app with a TypeScript + React frontend and a Python FastAPI backend using Google Gemini AI and DuckDuckGo — no API key required for search (but AI needs Gemini API key). Features include chat interface, web search, and source citations.',
           tech: ['TypeScript', 'FastAPI', 'Google Gemini AI', 'DuckDuckGo'],
           github: 'https://github.com/macapagaljoshua123/dev-intern-search-api',
+          category: 'ai'
         }
       ]
+    }
+  },
+  computed: {
+    filteredProjects() {
+      if (this.currentCategory === 'all') {
+        return this.projects
+      }
+      return this.projects.filter(project => project.category === this.currentCategory)
+    },
+    categories() {
+      return ['all', ...new Set(this.projects.map(p => p.category))]
     }
   },
   mounted() {
@@ -160,14 +205,14 @@ export default {
   },
   methods: {
     handleImageError(project) {
-      project.image = project.fallbackImage || '/images/fallback-project.png'
+      project.image = project.fallbackImage
     },
     nextSlide() {
-      this.currentIndex = (this.currentIndex + 1) % this.projects.length
+      this.currentIndex = (this.currentIndex + 1) % this.filteredProjects.length
       this.resetAutoplay()
     },
     prevSlide() {
-      this.currentIndex = (this.currentIndex - 1 + this.projects.length) % this.projects.length
+      this.currentIndex = (this.currentIndex - 1 + this.filteredProjects.length) % this.filteredProjects.length
       this.resetAutoplay()
     },
     goToSlide(index) {
@@ -217,6 +262,32 @@ export default {
     resetAutoplay() {
       this.stopAutoplay()
       this.startAutoplay()
+    },
+    async copyGitClone() {
+      const gitUrl = `git clone ${this.selectedProject.github}`
+      try {
+        await navigator.clipboard.writeText(gitUrl)
+        this.copyButtonText = 'Copied! ✓'
+        setTimeout(() => {
+          this.copyButtonText = 'Copy'
+        }, 2000)
+      } catch (err) {
+        console.error('Failed to copy:', err)
+        this.copyButtonText = 'Failed! ✗'
+        setTimeout(() => {
+          this.copyButtonText = 'Copy'
+        }, 2000)
+      }
+    }
+  },
+  watch: {
+    currentCategory() {
+      this.currentIndex = 0
+    },
+    filteredProjects() {
+      if (this.currentIndex >= this.filteredProjects.length) {
+        this.currentIndex = Math.max(0, this.filteredProjects.length - 1)
+      }
     }
   }
 }
@@ -245,9 +316,46 @@ export default {
 h2 {
   font-size: 2.8rem;
   font-weight: 700;
-  margin-bottom: 3rem;
+  margin-bottom: 1rem;
   color: #007bff;
   text-align: center;
+}
+
+.filter-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 0.5rem 1.5rem;
+  background: white;
+  border: 2px solid #007bff;
+  border-radius: 25px;
+  color: #007bff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.dark-mode .filter-btn {
+  background: #1e1e2e;
+  border-color: #66b3ff;
+  color: #66b3ff;
+}
+
+.filter-btn:hover {
+  background: #007bff;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.filter-btn.active {
+  background: #007bff;
+  color: white;
 }
 
 .carousel-container {
@@ -381,6 +489,11 @@ h2 {
   transform: translateY(-50%) scale(1.1);
 }
 
+.carousel-btn:focus-visible {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
 .prev-btn {
   left: -60px;
 }
@@ -486,6 +599,11 @@ h2 {
   transform: rotate(90deg);
 }
 
+.modal-close:focus-visible {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
 .modal-header {
   display: flex;
   align-items: center;
@@ -568,6 +686,7 @@ h2 {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+  margin-bottom: 1rem;
 }
 
 .modal-link {
@@ -597,6 +716,60 @@ h2 {
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
+.git-clone-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.dark-mode .git-clone-section {
+  border-top-color: #3a3a4e;
+}
+
+.clone-input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.clone-input-group input {
+  flex: 1;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  color: #333;
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+.dark-mode .clone-input-group input {
+  background: #2a2a3e;
+  border-color: #3a3a4e;
+  color: #e0e0e0;
+}
+
+.copy-btn {
+  padding: 0.75rem 1.5rem;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.copy-btn:hover {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.copy-btn:focus-visible {
+  outline: 2px solid #28a745;
+  outline-offset: 2px;
+}
+
 @media (max-width: 768px) {
   .projects {
     padding: 4rem 1rem;
@@ -605,6 +778,15 @@ h2 {
 
   h2 {
     font-size: 2rem;
+  }
+
+  .filter-buttons {
+    gap: 0.5rem;
+  }
+  
+  .filter-btn {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
   }
 
   .carousel-btn {
@@ -627,6 +809,18 @@ h2 {
 
   .modal-header h2 {
     font-size: 1.3rem;
+  }
+  
+  .clone-input-group {
+    flex-direction: column;
+  }
+  
+  .clone-input-group input {
+    width: 100%;
+  }
+  
+  .copy-btn {
+    width: 100%;
   }
 }
 
