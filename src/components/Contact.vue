@@ -8,57 +8,47 @@
       
       <div class="contact-content">
         <div class="contact-form">
-          <form @submit.prevent="submitForm">
-            <div class="form-group">
-              <label for="name">Name</label>
+          <form @submit.prevent="submitForm" novalidate>
+            <div class="form-group" :class="{ 'error': errors.name }">
+              <label for="name">Name *</label>
               <input 
                 v-model="form.name"
                 type="text" 
                 id="name" 
                 placeholder="Your name"
-                required
+                @blur="validateField('name')"
               >
+              <span v-if="errors.name" class="error-message">{{ errors.name }}</span>
             </div>
             
-            <div class="form-group">
-              <label for="email">Email</label>
+            <div class="form-group" :class="{ 'error': errors.email }">
+              <label for="email">Email *</label>
               <input 
                 v-model="form.email"
                 type="email" 
                 id="email" 
                 placeholder="your@email.com"
-                required
+                @blur="validateField('email')"
               >
+              <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
             </div>
             
-            <div class="form-group">
-              <label for="subject">Subject</label>
-              <input 
-                v-model="form.subject"
-                type="text" 
-                id="subject" 
-                placeholder="Message subject"
-                required
-              >
-            </div>
-            
-            <div class="form-group">
-              <label for="message">Message</label>
+            <div class="form-group" :class="{ 'error': errors.message }">
+              <label for="message">Message *</label>
               <textarea 
                 v-model="form.message"
                 id="message" 
                 placeholder="Your message..."
                 rows="5"
-                required
+                @blur="validateField('message')"
               ></textarea>
+              <span v-if="errors.message" class="error-message">{{ errors.message }}</span>
             </div>
             
-            <button type="submit" class="submit-btn">
-              <Icon name="send" /> Send Message
+            <button type="submit" class="submit-btn" :disabled="isSubmitting">
+              <span v-if="isSubmitting" class="spinner"></span>
+              <span v-else>📧 Send Message</span>
             </button>
-            <p v-if="formMessage" :class="['form-message', formStatus]">
-              {{ formMessage }}
-            </p>
           </form>
         </div>
         
@@ -77,10 +67,10 @@
               <h3>Social Links</h3>
             </div>
             <div class="social-list">
-              <a href="https://github.com/macapagaljoshua123" target="_blank" rel="noopener">
+              <a href="https://github.com/macapagaljoshua123" target="_blank" rel="noopener noreferrer">
                 <Icon name="github" /> GitHub
               </a>
-              <a href="https://www.linkedin.com/in/joshua-macapagal-5551643bb/" target="_blank" rel="noopener">
+              <a href="https://www.linkedin.com/in/joshua-macapagal-5551643bb/" target="_blank" rel="noopener noreferrer">
                 <Icon name="linkedin" /> LinkedIn
               </a>
             </div>
@@ -96,11 +86,21 @@
         </div>
       </div>
     </div>
+
+    <!-- Toast Notification -->
+    <div v-if="toast.show" :class="['toast', toast.type]" @click="toast.show = false">
+      <span class="toast-icon">{{ toast.type === 'success' ? '✓' : '✗' }}</span>
+      <span class="toast-message">{{ toast.message }}</span>
+    </div>
   </section>
 </template>
 
 <script>
 import Icon from './Icon.vue'
+
+// Formspree endpoint (FREE - sign up at formspree.io)
+// Replace YOUR_FORM_ID with your actual Formspree form ID
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID'
 
 export default {
   name: 'Contact',
@@ -112,38 +112,127 @@ export default {
       form: {
         name: '',
         email: '',
-        subject: '',
         message: ''
       },
-      formMessage: '',
-      formStatus: ''
+      errors: {
+        name: '',
+        email: '',
+        message: ''
+      },
+      isSubmitting: false,
+      toast: {
+        show: false,
+        message: '',
+        type: 'success'
+      }
     }
   },
   methods: {
-    submitForm() {
-      if (this.form.name && this.form.email && this.form.subject && this.form.message) {
-        console.log('Form submitted:', this.form)
-        
-        this.formStatus = 'success'
-        this.formMessage = '✓ Message sent successfully! Thank you for reaching out.'
-        
-        setTimeout(() => {
-          this.resetForm()
-        }, 2000)
-      } else {
-        this.formStatus = 'error'
-        this.formMessage = '✗ Please fill in all fields'
+    validateField(field) {
+      const value = this.form[field].trim()
+      
+      switch(field) {
+        case 'name':
+          if (!value) {
+            this.errors.name = 'Name is required'
+          } else if (value.length < 2) {
+            this.errors.name = 'Name must be at least 2 characters'
+          } else {
+            this.errors.name = ''
+          }
+          break
+          
+        case 'email':
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+          if (!value) {
+            this.errors.email = 'Email is required'
+          } else if (!emailRegex.test(value)) {
+            this.errors.email = 'Please enter a valid email address'
+          } else {
+            this.errors.email = ''
+          }
+          break
+          
+        case 'message':
+          if (!value) {
+            this.errors.message = 'Message is required'
+          } else if (value.length < 10) {
+            this.errors.message = 'Message must be at least 10 characters'
+          } else {
+            this.errors.message = ''
+          }
+          break
       }
     },
+    
+    validateForm() {
+      this.validateField('name')
+      this.validateField('email')
+      this.validateField('message')
+      return !this.errors.name && !this.errors.email && !this.errors.message
+    },
+    
+    showToast(message, type = 'success') {
+      this.toast = {
+        show: true,
+        message,
+        type
+      }
+      
+      // Auto hide after 4 seconds
+      setTimeout(() => {
+        this.toast.show = false
+      }, 4000)
+    },
+    
+    async submitForm() {
+      if (!this.validateForm()) {
+        this.showToast('Please fix the errors in the form', 'error')
+        return
+      }
+      
+      this.isSubmitting = true
+      
+      try {
+        const response = await fetch(FORMSPREE_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            name: this.form.name,
+            email: this.form.email,
+            message: this.form.message
+          })
+        })
+        
+        if (response.ok) {
+          this.showToast('✓ Message sent successfully! I\'ll get back to you soon.', 'success')
+          this.resetForm()
+        } else {
+          const data = await response.json()
+          throw new Error(data.errors ? data.errors.map(e => e.message).join(', ') : 'Failed to send')
+        }
+      } catch (error) {
+        console.error('Form submission error:', error)
+        this.showToast('Failed to send message. Please try again or email me directly.', 'error')
+      } finally {
+        this.isSubmitting = false
+      }
+    },
+    
     resetForm() {
       this.form = {
         name: '',
         email: '',
-        subject: '',
         message: ''
       }
-      this.formMessage = ''
-      this.formStatus = ''
+      this.errors = {
+        name: '',
+        email: '',
+        message: ''
+      }
     }
   }
 }
@@ -161,7 +250,7 @@ export default {
 }
 
 .dark-mode .contact {
-  background: rgba(20, 20, 40, 0.85);
+  background: #121212;
 }
 
 .container {
@@ -175,7 +264,6 @@ h2 {
   margin-bottom: 1rem;
   color: #007bff;
   text-align: center;
-  letter-spacing: -0.5px;
 }
 
 .contact-intro {
@@ -187,7 +275,7 @@ h2 {
 }
 
 .dark-mode .contact-intro {
-  color: #ccc;
+  color: #e0e0e0;
 }
 
 .contact-content {
@@ -205,12 +293,8 @@ h2 {
 }
 
 .dark-mode .contact-form {
-  background: rgba(30, 30, 50, 0.9);
+  background: #1e1e2e;
   border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.contact-form:hover {
-  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.1);
 }
 
 .form-group {
@@ -232,21 +316,22 @@ h2 {
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 0.8rem;
-  border: 1px solid #ddd;
+  padding: 12px;
+  border: 2px solid #ddd;
   border-radius: 8px;
   font-family: inherit;
   font-size: 0.95rem;
   background: white;
   color: #333;
   transition: all 0.3s ease;
+  min-height: 44px;
 }
 
 .dark-mode .form-group input,
 .dark-mode .form-group textarea {
-  background: rgba(50, 50, 70, 0.9);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: #2a2a3e;
+  border-color: #3a3a4e;
+  color: #e0e0e0;
 }
 
 .form-group input:focus,
@@ -256,9 +341,22 @@ h2 {
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
+.form-group.error input,
+.form-group.error textarea {
+  border-color: #dc3545;
+}
+
+.error-message {
+  display: block;
+  color: #dc3545;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+}
+
 .submit-btn {
   width: 100%;
-  padding: 0.8rem;
+  padding: 12px;
+  min-height: 48px;
   background: linear-gradient(135deg, #007bff, #0056b3);
   color: white;
   border: none;
@@ -273,37 +371,91 @@ h2 {
   gap: 0.5rem;
 }
 
-.submit-btn:hover {
+.submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
-.form-message {
-  margin-top: 1rem;
-  padding: 0.8rem;
-  border-radius: 8px;
-  text-align: center;
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid white;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  animation: slideIn 0.3s ease;
+  cursor: pointer;
+  max-width: 350px;
+}
+
+.dark-mode .toast {
+  background: #1e1e2e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toast.success {
+  border-left: 4px solid #28a745;
+}
+
+.toast.error {
+  border-left: 4px solid #dc3545;
+}
+
+.toast-icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.toast.success .toast-icon {
+  color: #28a745;
+}
+
+.toast.error .toast-icon {
+  color: #dc3545;
+}
+
+.toast-message {
   font-size: 0.9rem;
+  color: #333;
 }
 
-.form-message.success {
-  background: #d4edda;
-  color: #155724;
+.dark-mode .toast-message {
+  color: #e0e0e0;
 }
 
-.dark-mode .form-message.success {
-  background: #1a3a1a;
-  color: #90ee90;
-}
-
-.form-message.error {
-  background: #f8d7da;
-  color: #721c24;
-}
-
-.dark-mode .form-message.error {
-  background: #3a1a1a;
-  color: #ff6b6b;
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .contact-info {
@@ -321,7 +473,7 @@ h2 {
 }
 
 .dark-mode .info-item {
-  background: rgba(30, 30, 50, 0.9);
+  background: #1e1e2e;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -360,6 +512,8 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  min-height: 44px;
+  padding: 10px 0;
 }
 
 .info-item a:hover {
@@ -372,7 +526,7 @@ h2 {
 }
 
 .dark-mode .info-item p {
-  color: #ccc;
+  color: #e0e0e0;
 }
 
 .social-list {
@@ -383,47 +537,26 @@ h2 {
 
 @media (max-width: 768px) {
   .contact {
-    padding: 4rem 2rem;
+    padding: 4rem 1rem;
     margin: 1rem;
   }
 
   h2 {
-    font-size: 2.2rem;
-  }
-
-  .contact-intro {
-    margin-bottom: 3rem;
-    font-size: 1rem;
+    font-size: 2rem;
   }
 
   .contact-content {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-
-  .contact-form,
-  .info-item {
-    padding: 1.2rem;
-  }
 }
 
 @media (max-width: 480px) {
-  .contact {
-    padding: 3rem 1.5rem;
-    margin: 0.5rem;
-  }
-
-  h2 {
-    font-size: 1.8rem;
-  }
-
-  .contact-intro {
-    font-size: 0.9rem;
-  }
-
-  .submit-btn {
-    padding: 0.7rem;
-    font-size: 0.9rem;
+  .toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    max-width: calc(100% - 32px);
   }
 }
 </style>

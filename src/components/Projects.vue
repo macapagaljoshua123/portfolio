@@ -3,7 +3,6 @@
     <div class="container">
       <h2>Featured Projects</h2>
       
-      <!-- Carousel Container -->
       <div class="carousel-container">
         <div class="carousel-wrapper">
           <div 
@@ -17,9 +16,15 @@
               @click="openModal(project)"
             >
               <div class="project-image">
-                <img :src="project.image" :alt="project.title" class="project-img">
+                <img 
+                  :src="project.image" 
+                  :alt="project.title" 
+                  class="project-img"
+                  loading="lazy"
+                  @error="handleImageError(project)"
+                >
                 <div class="project-overlay">
-                  <span class="view-details">Click to View Details</span>
+                  <span class="view-details">🔍 Click to View Details</span>
                 </div>
               </div>
               <h3>{{ project.title }}</h3>
@@ -28,15 +33,13 @@
           </div>
         </div>
 
-        <!-- Navigation Buttons -->
-        <button class="carousel-btn prev-btn" @click="prevSlide">
+        <button class="carousel-btn prev-btn" @click.stop="prevSlide" aria-label="Previous project">
           ❮
         </button>
-        <button class="carousel-btn next-btn" @click="nextSlide">
+        <button class="carousel-btn next-btn" @click.stop="nextSlide" aria-label="Next project">
           ❯
         </button>
 
-        <!-- Dots Indicator -->
         <div class="carousel-dots">
           <span 
             v-for="(_, index) in projects" 
@@ -48,10 +51,10 @@
         </div>
       </div>
 
-      <!-- Modal for Project Details -->
+      <!-- Modal -->
       <div v-if="selectedProject" class="modal" @click.self="closeModal">
         <div class="modal-content">
-          <button class="modal-close" @click="closeModal">×</button>
+          <button class="modal-close" @click="closeModal" aria-label="Close">×</button>
           
           <div class="modal-header">
             <div class="modal-icon">{{ selectedProject.icon }}</div>
@@ -59,7 +62,13 @@
           </div>
           
           <div class="modal-body">
-            <img :src="selectedProject.image" :alt="selectedProject.title" class="modal-img">
+            <img 
+              :src="selectedProject.image" 
+              :alt="selectedProject.title" 
+              class="modal-img"
+              loading="lazy"
+              @error="handleImageError(selectedProject)"
+            >
             
             <div class="modal-description">
               <p>{{ selectedProject.description }}</p>
@@ -75,10 +84,10 @@
             </div>
             
             <div class="modal-links">
-              <a v-if="selectedProject.github" :href="selectedProject.github" target="_blank" class="modal-link github">
+              <a v-if="selectedProject.github" :href="selectedProject.github" target="_blank" rel="noopener noreferrer" class="modal-link github">
                 <Icon name="github" /> View on GitHub
               </a>
-              <a v-if="selectedProject.link" :href="selectedProject.link" target="_blank" class="modal-link demo">
+              <a v-if="selectedProject.link" :href="selectedProject.link" target="_blank" rel="noopener noreferrer" class="modal-link demo">
                 <Icon name="external" /> Live Demo
               </a>
             </div>
@@ -102,25 +111,27 @@ export default {
       currentIndex: 0,
       selectedProject: null,
       autoplayInterval: null,
+      scrollPosition: 0,
       projects: [
         {
           id: 1,
           title: 'EdgeLink WebApp',
           icon: '🌐',
           tagline: 'Interactive Event Platform',
-          image: 'public/edgelink.png',
+          image: 'edgelink.png',
+          fallbackImage: '/images/fallback-project.png',
           description: 'A web application deployed on infinityfree hosting that includes a responsive design and modern UI elements. This web app allows you to create Events, Live Forms, Word Clouds, and QnAce for interactive Q&A sessions like Kahoot.',
           tech: ['HTML/CSS', 'JavaScript', 'PHP/MySQL'],
           github: 'https://github.com/macapagaljoshua123/edgelinkfree',
-          link: 'http://edgelinkwebapp.great-site.net/',
-          demo: 'http://edgelinkwebapp.great-site.net/'
+          link: 'http://edgelinkwebapp.great-site.net/'
         },
         {
           id: 2,
           title: 'PC Parts E-Commerce',
           icon: '🖥️',
           tagline: 'Build Your Dream PC',
-          image: 'public/pceco.png',
+          image: 'pceco.png',
+          fallbackImage: '/images/fallback-project.png',
           description: 'A full-stack web application for browsing and purchasing PC components. Built with React.js frontend, Node.js backend, and PostgreSQL database. Features include product filtering, shopping cart, and user authentication.',
           tech: ['React', 'Node.js', 'PostgreSQL'],
           github: 'https://github.com/macapagaljoshua123/pcgosite',
@@ -130,7 +141,8 @@ export default {
           title: 'AI Search App',
           icon: '✨',
           tagline: 'AI-Powered Web Search',
-          image: 'public/ai-assistant.png',
+          image: 'ai-assistant.png',
+          fallbackImage: '/images/fallback-project.png',
           description: 'AI-powered web search app with a TypeScript + React frontend and a Python FastAPI backend using Google Gemini AI and DuckDuckGo — no API key required for search (but AI needs Gemini API key). Features include chat interface, web search, and source citations.',
           tech: ['TypeScript', 'FastAPI', 'Google Gemini AI', 'DuckDuckGo'],
           github: 'https://github.com/macapagaljoshua123/dev-intern-search-api',
@@ -140,11 +152,16 @@ export default {
   },
   mounted() {
     this.startAutoplay()
+    window.addEventListener('keydown', this.handleEscapeKey)
   },
   beforeUnmount() {
     this.stopAutoplay()
+    window.removeEventListener('keydown', this.handleEscapeKey)
   },
   methods: {
+    handleImageError(project) {
+      project.image = project.fallbackImage || '/images/fallback-project.png'
+    },
     nextSlide() {
       this.currentIndex = (this.currentIndex + 1) % this.projects.length
       this.resetAutoplay()
@@ -158,32 +175,33 @@ export default {
       this.resetAutoplay()
     },
     lockScroll() {
-      // Save current scroll position
       this.scrollPosition = window.scrollY
-      // Add class to body to lock scroll
       document.body.style.overflow = 'hidden'
       document.body.style.position = 'fixed'
       document.body.style.top = `-${this.scrollPosition}px`
       document.body.style.width = '100%'
     },
     unlockScroll() {
-      // Remove the fixed positioning
       document.body.style.overflow = ''
       document.body.style.position = ''
       document.body.style.top = ''
       document.body.style.width = ''
-      // Restore scroll position
       window.scrollTo(0, this.scrollPosition)
     },
     openModal(project) {
       this.selectedProject = project
-      this.lockScroll()  // Lock scroll when modal opens
+      this.lockScroll()
       this.stopAutoplay()
     },
     closeModal() {
       this.selectedProject = null
-      this.unlockScroll()  // Unlock scroll when modal closes
+      this.unlockScroll()
       this.startAutoplay()
+    },
+    handleEscapeKey(event) {
+      if (event.key === 'Escape' && this.selectedProject) {
+        this.closeModal()
+      }
     },
     startAutoplay() {
       this.autoplayInterval = setInterval(() => {
@@ -216,7 +234,7 @@ export default {
 }
 
 .dark-mode .projects {
-  background: rgba(20, 20, 40, 0.85);
+  background: #121212;
 }
 
 .container {
@@ -230,10 +248,8 @@ h2 {
   margin-bottom: 3rem;
   color: #007bff;
   text-align: center;
-  letter-spacing: -0.5px;
 }
 
-/* ========== CAROUSEL STYLES ========== */
 .carousel-container {
   position: relative;
   width: 100%;
@@ -263,7 +279,8 @@ h2 {
 }
 
 .dark-mode .project-card {
-  background: rgba(30, 30, 50, 0.9);
+  background: #1e1e2e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .project-card:hover {
@@ -313,10 +330,13 @@ h2 {
   color: white;
   font-size: 1rem;
   font-weight: 600;
-  padding: 10px 20px;
+  padding: 12px 24px;
   background: #007bff;
   border-radius: 30px;
   border: 2px solid white;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .project-card h3 {
@@ -334,16 +354,15 @@ h2 {
 }
 
 .dark-mode .project-tagline {
-  color: #ccc;
+  color: #e0e0e0;
 }
 
-/* Carousel Buttons */
 .carousel-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 45px;
-  height: 45px;
+  width: 48px;
+  height: 48px;
   background: rgba(0, 123, 255, 0.8);
   color: white;
   border: none;
@@ -352,6 +371,9 @@ h2 {
   cursor: pointer;
   transition: all 0.3s ease;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .carousel-btn:hover {
@@ -367,7 +389,6 @@ h2 {
   right: -60px;
 }
 
-/* Dots */
 .carousel-dots {
   display: flex;
   justify-content: center;
@@ -382,6 +403,7 @@ h2 {
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s ease;
+  min-width: 12px;
 }
 
 .dot:hover {
@@ -395,7 +417,7 @@ h2 {
   border-radius: 10px;
 }
 
-/* ========== MODAL STYLES ========== */
+/* Modal Styles */
 .modal {
   position: fixed;
   top: 0;
@@ -452,6 +474,11 @@ h2 {
   color: #666;
   transition: all 0.3s ease;
   z-index: 10;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-close:hover {
@@ -504,7 +531,7 @@ h2 {
 }
 
 .dark-mode .modal-description p {
-  color: #ccc;
+  color: #e0e0e0;
 }
 
 .modal-tech h3 {
@@ -523,10 +550,13 @@ h2 {
 .tech-badge {
   background: #e7f3ff;
   color: #0066cc;
-  padding: 0.4rem 1rem;
+  padding: 8px 16px;
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 500;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .dark-mode .tech-badge {
@@ -544,7 +574,8 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.7rem 1.5rem;
+  padding: 12px 24px;
+  min-height: 48px;
   border-radius: 10px;
   text-decoration: none;
   font-weight: 600;
@@ -566,7 +597,6 @@ h2 {
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .projects {
     padding: 4rem 1rem;
@@ -578,9 +608,9 @@ h2 {
   }
 
   .carousel-btn {
-    width: 35px;
-    height: 35px;
-    font-size: 1rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
   }
 
   .prev-btn {
@@ -597,12 +627,6 @@ h2 {
 
   .modal-header h2 {
     font-size: 1.3rem;
-  }
-
-  .modal-icon {
-    width: 45px;
-    height: 45px;
-    font-size: 1.5rem;
   }
 }
 
