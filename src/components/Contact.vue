@@ -98,9 +98,10 @@
 <script>
 import Icon from './Icon.vue'
 
-// Formspree endpoint (FREE - sign up at formspree.io)
-// Replace YOUR_FORM_ID with your actual Formspree form ID
-const FORMSPREE_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID'
+// ✅ IMPORTANT: You MUST replace this with your REAL Formspree form ID
+// Get it from: https://formspree.io/ (Sign up → Create new form → Copy your form ID)
+// Your form ID will look like: "xeqvzrkv" or similar
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xkoaynbj'
 
 export default {
   name: 'Contact',
@@ -186,6 +187,12 @@ export default {
     },
     
     async submitForm() {
+      // Check if Formspree ID is still placeholder
+      if (FORMSPREE_ENDPOINT.includes('YOUR_FORM_ID_HERE')) {
+        this.showToast('⚠️ Form not configured yet. Please email me directly at joshuamacapagal0409@gmail.com', 'error')
+        return
+      }
+      
       if (!this.validateForm()) {
         this.showToast('Please fix the errors in the form', 'error')
         return
@@ -216,7 +223,7 @@ export default {
         }
       } catch (error) {
         console.error('Form submission error:', error)
-        this.showToast('Failed to send message. Please try again or email me directly.', 'error')
+        this.showToast('Failed to send message. Please email me directly at joshuamacapagal0409@gmail.com', 'error')
       } finally {
         this.isSubmitting = false
       }
