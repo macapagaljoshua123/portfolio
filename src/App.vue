@@ -136,7 +136,7 @@
         <p>&copy; 2026 Joshua Macapagal. All rights reserved.</p>
         <div class="social-links">
           <a href="https://github.com/macapagaljoshua123" target="_blank" rel="noopener noreferrer"><Icon name="github" /></a>
-          <a href="https://linkedin.com/in/joshuamacapagal" target="_blank" rel="noopener noreferrer"><Icon name="linkedin" /></a>
+          <a href="https://www.linkedin.com/in/joshua-macapagal-5551643bb/" target="_blank" rel="noopener noreferrer"><Icon name="linkedin" /></a>
           <a href="mailto:joshuamacapagal0409@gmail.com"><Icon name="mail" /></a>
         </div>
       </div>
