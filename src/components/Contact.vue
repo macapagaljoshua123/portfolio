@@ -53,7 +53,9 @@
               ></textarea>
             </div>
             
-            <button type="submit" class="submit-btn">Send Message</button>
+            <button type="submit" class="submit-btn">
+              <Icon name="send" /> Send Message
+            </button>
             <p v-if="formMessage" :class="['form-message', formStatus]">
               {{ formMessage }}
             </p>
@@ -62,20 +64,33 @@
         
         <div class="contact-info">
           <div class="info-item">
-            <h3>📧 Email</h3>
+            <div class="info-header">
+              <Icon name="mail" class="info-icon" />
+              <h3>Email</h3>
+            </div>
             <a href="mailto:your-email@example.com">joshuamacapagal0409@gmail.com</a>
           </div>
           
           <div class="info-item">
-            <h3>🔗 Social Links</h3>
+            <div class="info-header">
+              <Icon name="linkedin" class="info-icon" />
+              <h3>Social Links</h3>
+            </div>
             <div class="social-list">
-              <a href="https://github.com/macapagaljoshua123" target="_blank" rel="noopener">https://github.com/macapagaljoshua123</a>
-              <a href="https://www.linkedin.com/in/joshua-macapagal-5551643bb/" target="_blank" rel="noopener">LinkedIn</a>
+              <a href="https://github.com/macapagaljoshua123" target="_blank" rel="noopener">
+                <Icon name="github" /> GitHub
+              </a>
+              <a href="https://www.linkedin.com/in/joshua-macapagal-5551643bb/" target="_blank" rel="noopener">
+                <Icon name="linkedin" /> LinkedIn
+              </a>
             </div>
           </div>
           
           <div class="info-item">
-            <h3>📍 Location</h3>
+            <div class="info-header">
+              <Icon name="location" class="info-icon" />
+              <h3>Location</h3>
+            </div>
             <p>San Jose San Miguel Bulacan</p>
           </div>
         </div>
@@ -85,8 +100,13 @@
 </template>
 
 <script>
+import Icon from './Icon.vue'
+
 export default {
   name: 'Contact',
+  components: {
+    Icon
+  },
   data() {
     return {
       form: {
@@ -136,13 +156,52 @@ export default {
 
 <style scoped>
 .contact {
-  padding: 5rem 2rem;
+  padding: 6rem 2rem;
   background: #f8f9fa;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease;
 }
 
-:deep(.dark-mode) .contact {
+:global(body.dark-mode) .contact,
+:global(html.dark-mode) .contact {
   background: #1a1a1a;
+}
+
+:global(body.dark-mode) .contact-intro,
+:global(html.dark-mode) .contact-intro {
+  color: #ccc;
+}
+
+:global(body.dark-mode) .contact-form,
+:global(html.dark-mode) .contact-form {
+  background: #1e1e2e;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+:global(body.dark-mode) .form-group label,
+:global(html.dark-mode) .form-group label {
+  color: #f0f0f0;
+}
+
+:global(body.dark-mode) .form-group input,
+:global(body.dark-mode) .form-group textarea,
+:global(html.dark-mode) .form-group input,
+:global(html.dark-mode) .form-group textarea {
+  background: #2a2a3e;
+  color: #f0f0f0;
+  border-color: #3a3a4e;
+}
+
+:global(body.dark-mode) .info-item,
+:global(html.dark-mode) .info-item {
+  background: #1e1e2e;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+:global(body.dark-mode) .info-item p,
+:global(html.dark-mode) .info-item p {
+  color: #ccc;
 }
 
 .container {
@@ -151,17 +210,20 @@ export default {
 }
 
 h2 {
-  font-size: 2.5rem;
+  font-size: 2.8rem;
+  font-weight: 700;
   margin-bottom: 1rem;
   color: #007bff;
   text-align: center;
+  letter-spacing: -0.5px;
 }
 
 .contact-intro {
   text-align: center;
-  font-size: 1.1rem;
-  margin-bottom: 3rem;
+  font-size: 1.05rem;
+  margin-bottom: 4rem;
   color: #666;
+  line-height: 1.6;
 }
 
 :deep(.dark-mode) .contact-intro {
@@ -172,19 +234,26 @@ h2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 3rem;
+  align-items: start;
 }
 
 .contact-form {
   background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 :deep(.dark-mode) .contact-form {
-  background: #2a2a2a;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  background: #1e1e2e;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.contact-form:hover {
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.1);
 }
 
 .form-group {
@@ -193,9 +262,10 @@ h2 {
 
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
+  margin-bottom: 0.6rem;
+  font-weight: 600;
   color: #333;
+  font-size: 0.95rem;
 }
 
 :deep(.dark-mode) .form-group label {
@@ -205,52 +275,84 @@ h2 {
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  padding: 0.9rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
   font-family: inherit;
   font-size: 1rem;
   background: white;
   color: #333;
-  transition: border-color 0.3s;
+  transition: all 0.3s ease;
 }
 
 :deep(.dark-mode) .form-group input,
 :deep(.dark-mode) .form-group textarea {
-  background: #333;
+  background: #2a2a3e;
   color: #f0f0f0;
-  border-color: #444;
+  border-color: #3a3a4e;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #999;
+}
+
+:deep(.dark-mode) .form-group input::placeholder,
+:deep(.dark-mode) .form-group textarea::placeholder {
+  color: #777;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
   border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
 }
 
 .submit-btn {
   width: 100%;
-  padding: 0.8rem;
-  background: #007bff;
+  padding: 1rem;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
 }
 
 .submit-btn:hover {
-  background: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 123, 255, 0.3);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
 }
 
 .form-message {
   margin-top: 1rem;
   padding: 1rem;
-  border-radius: 5px;
+  border-radius: 8px;
   text-align: center;
+  font-weight: 500;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .form-message.success {
@@ -285,44 +387,183 @@ h2 {
 
 .info-item {
   background: white;
-  padding: 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 :deep(.dark-mode) .info-item {
-  background: #2a2a2a;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  background: #1e1e2e;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.info-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.1);
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.info-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  font-size: 1.4rem;
+  flex-shrink: 0;
 }
 
 .info-item h3 {
   color: #007bff;
-  margin-bottom: 1rem;
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .info-item a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   color: #007bff;
-  transition: opacity 0.3s;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 0.5rem 0;
 }
 
 .info-item a:hover {
-  opacity: 0.7;
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+:deep(.dark-mode) .info-item a:hover {
+  color: #66b3ff;
 }
 
 .social-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.8rem;
+}
+
+.info-item p {
+  color: #666;
+  margin: 0;
+}
+
+:deep(.dark-mode) .info-item p {
+  color: #ccc;
 }
 
 @media (max-width: 768px) {
+  .contact {
+    padding: 4rem 2rem;
+  }
+
   h2 {
-    font-size: 2rem;
+    font-size: 2.2rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .contact-intro {
+    margin-bottom: 3rem;
+    font-size: 1rem;
   }
 
   .contact-content {
     grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .contact-form,
+  .info-item {
+    padding: 1.8rem;
+  }
+
+  .submit-btn {
+    padding: 0.9rem;
+    font-size: 0.95rem;
+  }
+
+  .info-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .info-item h3 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact {
+    padding: 3rem 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+  }
+
+  .contact-intro {
+    font-size: 0.95rem;
+  }
+
+  .contact-content {
+    gap: 2rem;
+  }
+
+  .contact-form,
+  .info-item {
+    padding: 1.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.2rem;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    padding: 0.8rem;
+    font-size: 0.95rem;
+  }
+
+  .submit-btn {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .info-header {
+    gap: 0.8rem;
+  }
+
+  .info-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .info-item h3 {
+    font-size: 1rem;
+  }
+
+  .social-list {
+    gap: 0.6rem;
+  }
+
+  .info-item a {
+    font-size: 0.9rem;
   }
 }
 </style>
