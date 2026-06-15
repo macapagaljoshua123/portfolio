@@ -1,12 +1,11 @@
 # Joshua Macapagal | Portfolio
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR_NETLIFY_SITE_ID/deploy-status)](https://your-portfolio-name.netlify.app/)
 [![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D?logo=vue.js)](https://vuejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?logo=vite)](https://vitejs.dev/)
 
 A modern, responsive portfolio website showcasing my work as a full-stack developer. Built with **Vue 3** and **Vite**.
 
-🔗 **Live Demo:** [https://your-portfolio-name.netlify.app](https://your-portfolio-name.netlify.app)
+🔗 **Live Demo:** [https://your-portfolio-name.vercel.app](https://portfolio-navy-beta-63.vercel.app/)
 
 ## 📸 Screenshots
 
