@@ -179,6 +179,7 @@ export default {
           description: 'AI-powered web search app with a TypeScript + React frontend and a Python FastAPI backend using Google Gemini AI and DuckDuckGo — no API key required for search (but AI needs Gemini API key). Features include chat interface, web search, and source citations.',
           tech: ['TypeScript', 'FastAPI', 'Google Gemini AI', 'DuckDuckGo'],
           github: 'https://github.com/macapagaljoshua123/dev-intern-search-api',
+          link: 'https://dev-intern-search-api-1kxv-deiwbv7iv.vercel.app/',
           category: 'ai'
         }
       ]
